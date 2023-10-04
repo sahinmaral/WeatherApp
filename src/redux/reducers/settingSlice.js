@@ -28,9 +28,9 @@ export const unitSlice = createSlice({
     updatePressureUnit: (state, action) => {
       state.unit.pressure = action.payload;
     },
-    updateLanguage : (state,action) => {
-      state.language = action.payload
-    }
+    updateLanguage: (state, action) => {
+      state.language = action.payload;
+    },
   },
 });
 
@@ -38,7 +38,7 @@ export const {
   updateTemperatureUnit,
   updateWindSpeedUnit,
   updatePressureUnit,
-  updateLanguage
+  updateLanguage,
 } = unitSlice.actions;
 
 export const getSettingState = (state) => state.setting;

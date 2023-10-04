@@ -1,12 +1,13 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 import colors from "../../assets/styles/colors";
 import baseStyles from "../../assets/styles/baseStyles";
+import Constants from "expo-constants";
 
 const makeStyles = (fontScale) =>
   StyleSheet.create({
     container: {
       width: "95%",
-      marginTop: 30,
+      marginTop: Constants.statusBarHeight,
       height: "65%",
       marginHorizontal: 10,
       borderRadius: 30,
@@ -57,11 +58,13 @@ const makeStyles = (fontScale) =>
         height: "10%",
         alignItems: "center",
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
       },
       text: [
         baseStyles.text,
         {
+          flex:3,
+          textAlign:"right",
           fontSize: 16 / fontScale,
           fontWeight: "600",
         },

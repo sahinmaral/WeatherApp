@@ -9,6 +9,7 @@ import axios from "axios";
 import * as Location from "expo-location";
 import Loading from "../Loading";
 import Error from "../Error";
+import CheckInternet from "../CheckInternet";
 import { getString } from "../../services/localStorage/react-native-async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,6 +20,7 @@ import {
   updateWindSpeedUnit,
 } from "../../redux/reducers/settingSlice";
 import getI18n from "../../locales/i18n";
+import useCheckInternet from "../../hooks/useCheckInternet";
 
 function Home({ navigation }) {
   //TODO: Yukseklik degisimlerinde animasyon eklenebilir
@@ -28,6 +30,8 @@ function Home({ navigation }) {
   const i18n = getI18n(language);
   const dispatch = useDispatch();
 
+  const isConnected = useCheckInternet();
+
   const [fetchResult, setFetchResult] = useState({
     loading: true,
     error: null,
@@ -36,13 +40,13 @@ function Home({ navigation }) {
     location: null,
   });
 
-  async function fetchWeatherData({ lat, lon, address }) {
+  async function fetchWeatherData({ latitude, longitude, address }) {
     return Promise.all([
       axios.get(
-        `${process.env.EXPO_PUBLIC_API_URL}/weather?lat=${lat}&lon=${lon}&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric`
+        `${process.env.EXPO_PUBLIC_API_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric`
       ),
       axios.get(
-        `${process.env.EXPO_PUBLIC_API_URL}/forecast?lat=${lat}&lon=${lon}&cnt=5&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric`
+        `${process.env.EXPO_PUBLIC_API_URL}/forecast?lat=${latitude}&lon=${longitude}&cnt=5&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric`
       ),
     ])
       .then(([resCurrentWeather, resHourlyWeathers]) => {
@@ -59,8 +63,8 @@ function Home({ navigation }) {
           hourlyWeathers: hourlyWeathersData,
           location: {
             coordinates: {
-              lat,
-              lon,
+              latitude,
+              longitude,
             },
             address,
           },
@@ -78,11 +82,13 @@ function Home({ navigation }) {
     }
 
     let location = await Location.getLastKnownPositionAsync({
-      requiredAccuracy: Location.Accuracy.Low,
+      requiredAccuracy: Location.Accuracy.Highest,
     });
     if (!location) {
+      //FIXME: bazen getCurrentPositionAsync fonksiyonunda sonsuza dek kitleniyor
       location = await Location.getCurrentPositionAsync({
-        accuracy: Location.LocationAccuracy.Low,
+        accuracy: Location.Accuracy.Highest,
+        maximumAge: 10000,
       });
     }
 
@@ -92,8 +98,8 @@ function Home({ navigation }) {
     });
 
     return {
-      lat: location.coords.latitude,
-      lon: location.coords.longitude,
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
       address: addressDetail[0],
     };
   }
@@ -128,10 +134,19 @@ function Home({ navigation }) {
     (async () => {
       try {
         await fetchLanguageFromLocalStorage();
+
+        if (!isConnected) {
+          throw i18n.t("noInternetConnection");
+        }
+
         await fetchUnitsFromLocalStorage();
 
-        const { lat, lon, address } = await fetchLocation();
-        const fetchedResult = await fetchWeatherData({ lat, lon, address });
+        const { latitude, longitude, address } = await fetchLocation();
+        const fetchedResult = await fetchWeatherData({
+          latitude,
+          longitude,
+          address,
+        });
         setFetchResult(fetchedResult);
       } catch (err) {
         setFetchResult({
@@ -147,6 +162,9 @@ function Home({ navigation }) {
     return <Loading i18n={i18n} />;
   }
 
+  if (!fetchResult.loading && !isConnected) {
+    return <CheckInternet />;
+  }
   if (!fetchResult.loading && fetchResult.error) {
     return <Error error={fetchResult.error} i18n={i18n} />;
   }
@@ -155,7 +173,7 @@ function Home({ navigation }) {
     return (
       <View style={styles.container}>
         <TodayWeatherCard
-          address={fetchResult.location.address}
+          currentLocation={fetchResult.location}
           currentWeather={fetchResult.currentWeather}
           visibleOf7DaysForecast={visibleOf7DaysForecast}
           navigation={navigation}

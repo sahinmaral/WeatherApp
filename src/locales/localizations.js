@@ -9,6 +9,8 @@ const en = {
   temperatureUnitRow: "Temperature Unit",
   windSpeedUnitRow: "Wind Speed Unit",
   atmosphericPressureUnitRow: "Atmospheric Pressure Unit",
+  noInternetConnection:
+    "To use this application, you have to connect internet. ",
   aboutRow: "About Us",
   authorRow: {
     header: "Author",
@@ -111,6 +113,37 @@ const en = {
   networkError:
     "Error occured during fetching weather data from API. Try closing and reopening application again",
   askPermissions: "Ask location permission again",
+  privacyPolicy: {
+    intro:
+      "WeatherApp is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you use our app. By using the App, you consent to the practices described in this Privacy Policy.",
+    first: {
+      header: "1. Information We Collect",
+      description:
+        "Location Information: We may collect and store your device's GPS coordinates or other location information to provide you with accurate weather forecasts and location-based services. You can disable location services in your device settings, but this may limit certain features of the App.",
+    },
+    second: {
+      header: "2. Disclosure of Your Information",
+      descriptionIntro:
+        "We may disclose your information in the following circumstances:",
+      description:
+        "a. Legal Requirements: To comply with applicable laws, regulations, legal processes, or government requests.",
+    },
+    third: {
+      header: "3. Data Security",
+      description:
+        "We take reasonable measures to protect your personal information from unauthorized access or disclosure. However, please be aware that no method of transmission over the internet or electronic storage is 100% secure.",
+    },
+    forth: {
+      header: "4. Children's Privacy",
+      description:
+        " WeatherApp is designed to be safe for children. We do not knowingly collect personal information from children under the age of 13. The App's features and content are appropriate for users of all ages.",
+    },
+    contact: {
+      header:"5. Contact Us",
+      description:
+        "If you have any questions or concerns regarding this Privacy Policy, please contact us at",
+    },
+  },
 };
 
 const tr = {
@@ -225,6 +258,38 @@ const tr = {
   networkError:
     "API dan hava durumu verilerini alırken hata oluştu. Uygulamayı kapatıp tekrar açmayı deneyin",
   askPermissions: "Konum iznini tekrar sorun",
+  noInternetConnection:
+    "Uygulamayı kullanabilmek için internete bağlanmanız gerekir.",
+  privacyPolicy: {
+    intro:
+      "WeatherApp, gizliliğinizi koruma taahhüdündedir. Bu Gizlilik Politikası, uygulamamızı kullanırken kişisel bilgilerinizi nasıl topladığımızı, kullanığımızı, açıkladığımızı ve koruduğumuzu açıklar. Uygulamayı kullanarak, bu Gizlilik Politikası'nda açıklanan uygulamalara izin vermiş olursunuz.",
+    first: {
+      header: "1. Topladığımız Bilgiler",
+      description:
+        "Konum Bilgileri: Hava durumu tahminleri ve konuma dayalı hizmetler sunmak için cihazınızın GPS koordinatlarını veya diğer konum bilgilerini toplayabilir ve saklayabiliriz. Cihazınızdaki ayarlarda konum hizmetlerini devre dışı bırakabilirsiniz, ancak bu, uygulamanın bazı özelliklerini sınırlayabilir.",
+    },
+    second: {
+      header: "2. Bilgilerinizin Paylaşımı",
+      descriptionIntro: "Bilgilerinizi aşağıdaki durumlarda açıklayabiliriz:",
+      description:
+        "a. Hukuki Gereksinimler: Geçerli yasalara, düzenlemelere, hukuki süreçlere veya hükümet taleplerine uygunluk sağlamak amacıyla.",
+    },
+    third: {
+      header: "3. Veri Güvenliği",
+      description:
+        "Kişisel bilgilerinizi yetkisiz erişime veya ifşaya karşı korumak için makul önlemler alıyoruz. Ancak, lütfen internet üzerinden iletim veya elektronik saklamanın %100 güvenli olmadığını unutmayın.",
+    },
+    forth: {
+      header: "4. Çocukların Gizliliği",
+      description:
+        "WeatherApp, çocuklar için güvenli olarak tasarlanmıştır. 13 yaşın altındaki çocuklardan bilerek kişisel bilgi toplamıyoruz. Uygulamanın özellikleri ve içeriği tüm yaş grupları için uygundur.",
+    },
+    contact: {
+      header:"5. Bizimle İletişime Geç",
+      description:
+        "Bu Gizlilik Politikası ile ilgili herhangi bir sorunuz veya endişeniz varsa, lütfen bize şu adresten ulaşın",
+    },
+  },
 };
 
 export { tr, en };

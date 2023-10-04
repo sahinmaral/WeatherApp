@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
 import Constants from "expo-constants";
 import FlashMessage from "react-native-flash-message";
+import PrivacyPolicy from "./src/screens/PrivacyPolicy/PrivacyPolicy";
 
 const Stack = createStackNavigator();
 
@@ -25,10 +26,11 @@ export default function App() {
 function NavigationWrapper() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="About" component={About} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
       </Stack.Navigator>
     </NavigationContainer>
   );

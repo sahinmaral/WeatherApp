@@ -16,7 +16,6 @@ import { getSettingState } from "../../redux/reducers/settingSlice";
 import { useWindowDimensions } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import getI18n from "../../locales/i18n";
-import { Appearance } from "react-native";
 
 function Settings({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -158,10 +157,7 @@ function Settings({ navigation }) {
           <TouchableOpacity
             style={styles.button.extra}
             onPress={() => {
-              showMessage({
-                message: i18n.t("privacyPolicyMaintenance"),
-                type: "info",
-              });
+              navigation.navigate("PrivacyPolicy")
             }}
           >
             <Text style={[baseStyles.text, styles.extra.text]}>

@@ -17,16 +17,15 @@ import {
   convertTemperature,
   convertWindSpeed,
 } from "../../helpers/unitComparisonHelper";
-import { showMessage } from "react-native-flash-message";
 import getI18n from "../../locales/i18n";
 
 function TodayWeatherCard({
   currentWeather,
-  address,
+  currentLocation,
   visibleOf7DaysForecast,
   navigation,
 }) {
-  const { unit,language } = useSelector(getSettingState);
+  const { unit, language } = useSelector(getSettingState);
 
   const i18n = getI18n(language);
 
@@ -67,22 +66,14 @@ function TodayWeatherCard({
       ]}
     >
       <View style={styles.header.container}>
-        <TouchableOpacity
-          onPress={() => {
-
-            showMessage({
-              message: i18n.t("multipleCountryWeatherReportMaintenance"),
-              type: "info",
-            });
-          }}
-        >
-          <Icon name="add-fill" size="32" color="white" />
-        </TouchableOpacity>
         <Text style={styles.header.text}>
-          {!address.city ? address.region : address.city} |{" "}
-          {address.isoCountryCode}
+          {!currentLocation.address.city
+            ? currentLocation.address.region
+            : currentLocation.address.city}{" "}
+          | {currentLocation.address.isoCountryCode}
         </Text>
         <TouchableOpacity
+          style={{flex:2,alignItems:"flex-end"}}
           onPress={() => {
             navigation.navigate("Settings");
           }}

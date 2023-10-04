@@ -6,6 +6,7 @@ import getI18n from "../../locales/i18n";
 import { useSelector } from "react-redux";
 import { getSettingState } from "../../redux/reducers/settingSlice";
 import { useWindowDimensions } from "react-native";
+import { View } from "react-native";
 
 function SevenDaysForecastCardList({ location }) {
   const { language } = useSelector(getSettingState);
@@ -19,10 +20,18 @@ function SevenDaysForecastCardList({ location }) {
     error,
     data: sevenDaysWeathers,
   } = useFetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/onecall?lat=${location.coordinates.lat}&lon=${location.coordinates.lon}&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric&exclude=current,minutely,hourly`
+    `${process.env.EXPO_PUBLIC_API_URL}/onecall?lat=${location.coordinates.latitud}&lon=${location.coordinates.longitude}&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric&exclude=current,minutely,hourly`
   );
 
   //FIXME : Bu kisim hata verdiginde herhangi bir hata mesaji gostermemiz gerekir.
+
+  if (!loading && error) {
+    return (
+      <View style={styles.error.container}>
+        <Text style={styles.error.text}>{i18n.t("networkError")}</Text>
+      </View>
+    );
+  }
 
   if (!loading && !error) {
     return (
