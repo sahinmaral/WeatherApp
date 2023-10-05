@@ -1,4 +1,4 @@
-import { LinearGradient } from "expo-linear-gradient";
+import LinearGradient from 'react-native-linear-gradient';
 import {
   ScrollView,
   Text,
@@ -31,11 +31,7 @@ function PrivacyPolicy({ navigation }) {
 
   return (
     <View style={styles.wrapper}>
-      <LinearGradient
-        locations={[0, 1]}
-        colors={["#62B8F6", "#2C79C1"]}
-        style={styles.container}
-      >
+      <LinearGradient colors={['#62B8F6', '#2C79C1']} style={styles.container}>
         <View style={styles.header.container}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="arrow-left-line" color={colors.white} />

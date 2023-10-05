@@ -1,32 +1,38 @@
-import { useEffect, useState } from "react";
-import { View } from "react-native";
-import TodayWeatherCard from "../../components/TodayWeatherCard";
-import BriefWeatherCardList from "../../components/BriefWeatherCardList";
-import Show7DaysForecastButton from "../../components/Show7DaysForecastButton";
-import SevenDaysForecastCardList from "../../components/SevenDaysForecastCardList";
-import styles from "./Home.styles";
-import axios from "axios";
-import * as Location from "expo-location";
-import Loading from "../Loading";
-import Error from "../Error";
-import CheckInternet from "../CheckInternet";
-import { getString } from "../../services/localStorage/react-native-async-storage";
-import { useDispatch, useSelector } from "react-redux";
+import {useEffect, useState} from 'react';
+import {View, PermissionsAndroid} from 'react-native';
+import TodayWeatherCard from '../../components/TodayWeatherCard';
+import BriefWeatherCardList from '../../components/BriefWeatherCardList';
+import Show7DaysForecastButton from '../../components/Show7DaysForecastButton';
+import SevenDaysForecastCardList from '../../components/SevenDaysForecastCardList';
+import styles from './Home.styles';
+import axios from 'axios';
+import Loading from '../Loading';
+import Error from '../Error';
+import CheckInternet from '../CheckInternet';
+import {getString} from '../../services/localStorage/react-native-async-storage';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   getSettingState,
   updateLanguage,
   updatePressureUnit,
   updateTemperatureUnit,
   updateWindSpeedUnit,
-} from "../../redux/reducers/settingSlice";
-import getI18n from "../../locales/i18n";
-import useCheckInternet from "../../hooks/useCheckInternet";
+} from '../../redux/reducers/settingSlice';
+import getI18n from '../../locales/i18n';
+import useCheckInternet from '../../hooks/useCheckInternet';
+import Geolocation from '@react-native-community/geolocation';
+import {
+  GEOCODE_API_URL,
+  GEOCODE_API_KEY,
+  WEATHER_API_URL,
+  WEATHER_API_KEY,
+} from '@env';
 
-function Home({ navigation }) {
+function Home({navigation}) {
   //TODO: Yukseklik degisimlerinde animasyon eklenebilir
   const [visibleOf7DaysForecast, setVisibleOf7DaysForecast] = useState(false);
 
-  const { language } = useSelector(getSettingState);
+  const {language} = useSelector(getSettingState);
   const i18n = getI18n(language);
   const dispatch = useDispatch();
 
@@ -40,13 +46,13 @@ function Home({ navigation }) {
     location: null,
   });
 
-  async function fetchWeatherData({ latitude, longitude, address }) {
+  async function fetchWeatherData({latitude, longitude, address}) {
     return Promise.all([
       axios.get(
-        `${process.env.EXPO_PUBLIC_API_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric`
+        `${WEATHER_API_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`,
       ),
       axios.get(
-        `${process.env.EXPO_PUBLIC_API_URL}/forecast?lat=${latitude}&lon=${longitude}&cnt=5&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric`
+        `${WEATHER_API_URL}/forecast?lat=${latitude}&lon=${longitude}&cnt=5&appid=${WEATHER_API_KEY}&units=metric`,
       ),
     ])
       .then(([resCurrentWeather, resHourlyWeathers]) => {
@@ -55,7 +61,7 @@ function Home({ navigation }) {
           hourlyWeathersData: resHourlyWeathers.data,
         };
       })
-      .then(({ currentWeatherData, hourlyWeathersData }) => {
+      .then(({currentWeatherData, hourlyWeathersData}) => {
         return {
           ...fetchResult,
           loading: false,
@@ -70,42 +76,79 @@ function Home({ navigation }) {
           },
         };
       })
-      .catch((err) => {
+      .catch(err => {
         throw err.message;
       });
   }
 
+  function getAddressFromCoordinates({latitude, longitude}) {
+    const url = `${GEOCODE_API_URL}/json?address=${latitude},${longitude}&key=${GEOCODE_API_KEY}`;
+    return axios.get(url);
+  }
+
+  const requestLocationPermission = async () => {
+    const status = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+
+    if (status !== 'granted')
+      throw i18n.t('locationServiceDeniedByUserMessage');
+  };
+
   async function fetchLocation() {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      throw "locationServiceDeniedByUserMessage";
-    }
+    try {
+      await requestLocationPermission();
 
-    let location = await Location.getLastKnownPositionAsync({
-      requiredAccuracy: Location.Accuracy.Highest,
-    });
-    if (!location) {
-      //FIXME: bazen getCurrentPositionAsync fonksiyonunda sonsuza dek kitleniyor
-      location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest,
-        maximumAge: 10000,
+      return new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+          async position => {
+            try {
+              const addressResponse = await getAddressFromCoordinates({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+              const addressComponentsFromResponse =
+                addressResponse.data.results[0].address_components;
+
+              let address = {
+                city: null,
+                country: null,
+              };
+
+              addressComponentsFromResponse.forEach(addressComponent => {
+                if (addressComponent.types.includes('country')) {
+                  address.country = addressComponent.long_name;
+                } else if (
+                  addressComponent.types.includes('administrative_area_level_1')
+                ) {
+                  address.city = addressComponent.long_name;
+                }
+              });
+
+              const location = {
+                address,
+                longitude: position.coords.longitude,
+                latitude: position.coords.latitude,
+              };
+
+              resolve(location);
+            } catch (error) {
+              reject(error);
+            }
+          },
+          error => {
+            reject(error.message);
+          },
+          {enableHighAccuracy: false, timeout: 15000, maximumAge: 10000},
+        );
       });
+    } catch (error) {
+      throw error;
     }
-
-    let addressDetail = await Location.reverseGeocodeAsync({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    });
-
-    return {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      address: addressDetail[0],
-    };
   }
 
   async function fetchLanguageFromLocalStorage() {
-    const languageUserSetBefore = await getString("language");
+    const languageUserSetBefore = await getString('language');
 
     if (languageUserSetBefore) {
       dispatch(updateLanguage(languageUserSetBefore));
@@ -113,9 +156,9 @@ function Home({ navigation }) {
   }
 
   async function fetchUnitsFromLocalStorage() {
-    const temperatureUnitUserSetBefore = await getString("temperature");
-    const windSpeedUnitUserSetBefore = await getString("windSpeed");
-    const airPressureUnitUserSetBefore = await getString("pressure");
+    const temperatureUnitUserSetBefore = await getString('temperature');
+    const windSpeedUnitUserSetBefore = await getString('windSpeed');
+    const airPressureUnitUserSetBefore = await getString('pressure');
 
     if (temperatureUnitUserSetBefore) {
       dispatch(updateTemperatureUnit(temperatureUnitUserSetBefore));
@@ -136,12 +179,13 @@ function Home({ navigation }) {
         await fetchLanguageFromLocalStorage();
 
         if (!isConnected) {
-          throw i18n.t("noInternetConnection");
+          throw i18n.t('noInternetConnection');
         }
 
         await fetchUnitsFromLocalStorage();
 
-        const { latitude, longitude, address } = await fetchLocation();
+        const {latitude, longitude, address} = await fetchLocation();
+
         const fetchedResult = await fetchWeatherData({
           latitude,
           longitude,
@@ -163,7 +207,7 @@ function Home({ navigation }) {
   }
 
   if (!fetchResult.loading && !isConnected) {
-    return <CheckInternet />;
+    return <CheckInternet i18n={i18n}/>;
   }
   if (!fetchResult.loading && fetchResult.error) {
     return <Error error={fetchResult.error} i18n={i18n} />;

@@ -1,10 +1,10 @@
-import LottieView from "lottie-react-native";
-import { Appearance, useWindowDimensions } from "react-native";
-import { View, Text } from "react-native";
-import colors from "../../assets/styles/colors";
+import LottieView from 'lottie-react-native';
+import {Appearance, useWindowDimensions} from 'react-native';
+import {View, Text} from 'react-native';
+import colors from '../../assets/styles/colors';
 
-function Error({ error, i18n }) {
-  const { fontScale } = useWindowDimensions();
+function Error({error}) {
+  const {fontScale} = useWindowDimensions();
 
   const colorScheme = Appearance.getColorScheme();
 
@@ -12,46 +12,35 @@ function Error({ error, i18n }) {
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
-        flexDirection: "column",
+        justifyContent: 'center',
+        flexDirection: 'column',
         backgroundColor: colors.slate,
-      }}
-    >
-      <View
-        style={{
-          flex: 2,
-          alignItems: "center",
-          justifyContent: "flex-end",
-        }}
-      >
+      }}>
+      <View style={{flex: 2, alignItems: 'center', justifyContent: 'flex-end'}}>
         <View
           style={{
-            width: "75%",
-            height: "75%",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+            width: '75%',
+            height: '75%',
+          }}>
           <LottieView
-            source={require("../../assets/images/error.json")}
+            style={{flex: 1}}
+            source={require('../../assets/images/error.json')}
             autoPlay
             loop
           />
         </View>
       </View>
-      <View style={{ flex: 2, alignItems: "center", paddingHorizontal: 20 }}>
-        <Text
-          style={{
-            marginTop: 50,
-            fontSize: 24 / fontScale,
-            textAlign: "center",
-            fontWeight: "bold",
-            color: colorScheme === "light" ? colors.white : colors.black,
-          }}
-        >
-          {!i18n.t(error) ? error : i18n.t(error)}
-        </Text>
-      </View>
+      <Text
+        style={{
+          flex: 1,
+          fontSize: 24 / fontScale,
+          marginTop: 50,
+          textAlign: 'center',
+          fontWeight: 'bold',
+          color: colorScheme === 'light' ? colors.black : colors.white,
+        }}>
+        {error}
+      </Text>
     </View>
   );
 }

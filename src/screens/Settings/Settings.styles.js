@@ -1,6 +1,5 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet,StatusBar,Dimensions } from "react-native";
 import colors from "../../assets/styles/colors";
-import { Dimensions } from "react-native";
 
 const baseStyles = {
   button: {
@@ -18,7 +17,7 @@ const makeStyles = (fontScale) =>
       flex: 1,
       height: "100%",
       marginHorizontal: 10,
-      marginTop: 30,
+      marginTop: StatusBar.currentHeight || 0,
       marginBottom: 10,
       padding: 20,
       borderRadius: 30,

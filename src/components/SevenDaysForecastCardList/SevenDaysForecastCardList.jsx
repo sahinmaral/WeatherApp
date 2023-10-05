@@ -7,6 +7,10 @@ import { useSelector } from "react-redux";
 import { getSettingState } from "../../redux/reducers/settingSlice";
 import { useWindowDimensions } from "react-native";
 import { View } from "react-native";
+import {
+  WEATHER_API_URL,
+  WEATHER_API_KEY,
+} from '@env';
 
 function SevenDaysForecastCardList({ location }) {
   const { language } = useSelector(getSettingState);
@@ -20,10 +24,8 @@ function SevenDaysForecastCardList({ location }) {
     error,
     data: sevenDaysWeathers,
   } = useFetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/onecall?lat=${location.coordinates.latitud}&lon=${location.coordinates.longitude}&appid=${process.env.EXPO_PUBLIC_API_KEY}&units=metric&exclude=current,minutely,hourly`
+    `${WEATHER_API_URL}/onecall?lat=${location.coordinates.latitude}&lon=${location.coordinates.longitude}&appid=${WEATHER_API_KEY}&units=metric&exclude=current,minutely,hourly`
   );
-
-  //FIXME : Bu kisim hata verdiginde herhangi bir hata mesaji gostermemiz gerekir.
 
   if (!loading && error) {
     return (

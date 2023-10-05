@@ -9,6 +9,7 @@ import {
 import { storeString } from "../../../services/localStorage/react-native-async-storage";
 import getI18n from "../../../locales/i18n";
 import { useWindowDimensions } from "react-native";
+import {Appearance} from 'react-native';
 
 function LanguageModalContent({ toggleModal }) {
   const { language } = useSelector(getSettingState);
@@ -16,8 +17,10 @@ function LanguageModalContent({ toggleModal }) {
 
   const i18n = getI18n(language);
 
+  const colorScheme = Appearance.getColorScheme();
+
   const { fontScale } = useWindowDimensions();
-  const styles = makeStyles(fontScale);
+  const styles = makeStyles(fontScale,colorScheme);
 
   const handleUpdateLanguage = async (desiredLanguage) => {
     await storeString("language", desiredLanguage);
