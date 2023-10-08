@@ -21,12 +21,8 @@ import {
 import getI18n from '../../locales/i18n';
 import useCheckInternet from '../../hooks/useCheckInternet';
 import Geolocation from '@react-native-community/geolocation';
-import {
-  GEOCODE_API_URL,
-  GEOCODE_API_KEY,
-  WEATHER_API_URL,
-  WEATHER_API_KEY,
-} from '@env';
+import { getAddressFromCoordinates,askLocationPermission } from '../../services/location';
+import { fetchDailyWeatherData,fetchTodayWeatherData } from '../../services/api/weather';
 
 function Home({navigation}) {
   //TODO: Yukseklik degisimlerinde animasyon eklenebilir
@@ -34,6 +30,7 @@ function Home({navigation}) {
 
   const {language} = useSelector(getSettingState);
   const i18n = getI18n(language);
+
   const dispatch = useDispatch();
 
   const isConnected = useCheckInternet();
@@ -48,12 +45,8 @@ function Home({navigation}) {
 
   async function fetchWeatherData({latitude, longitude, address}) {
     return Promise.all([
-      axios.get(
-        `${WEATHER_API_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`,
-      ),
-      axios.get(
-        `${WEATHER_API_URL}/forecast?lat=${latitude}&lon=${longitude}&cnt=5&appid=${WEATHER_API_KEY}&units=metric`,
-      ),
+      fetchTodayWeatherData({latitude,longitude}),
+      fetchDailyWeatherData({latitude,longitude}),
     ])
       .then(([resCurrentWeather, resHourlyWeathers]) => {
         return {
@@ -81,15 +74,8 @@ function Home({navigation}) {
       });
   }
 
-  function getAddressFromCoordinates({latitude, longitude}) {
-    const url = `${GEOCODE_API_URL}/json?address=${latitude},${longitude}&key=${GEOCODE_API_KEY}`;
-    return axios.get(url);
-  }
-
   const requestLocationPermission = async () => {
-    const status = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
+    const status = await askLocationPermission()
 
     if (status !== 'granted')
       throw i18n.t('locationServiceDeniedByUserMessage');
@@ -137,9 +123,13 @@ function Home({navigation}) {
             }
           },
           error => {
-            reject(error.message);
+            if (error.message === "No location provider available.") {
+              reject(i18n.t("noLocationProviderAvailable"));
+            } else {
+              reject(error.message);
+            }
           },
-          {enableHighAccuracy: false, timeout: 15000, maximumAge: 10000},
+          { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 }
         );
       });
     } catch (error) {

@@ -9,7 +9,7 @@ const makeStyles = (fontScale) =>
     content: {
       width: "100%",
       gap: 10,
-      height: "7%",
+      height: "8%",
       flexDirection: "row",
       backgroundColor: colors.lightDarkBlue,
       alignItems: "center",

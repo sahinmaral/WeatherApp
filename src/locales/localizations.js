@@ -25,6 +25,7 @@ const en = {
   rain: "rain",
   humidity: "Humidity",
   rainDoesntKnown: "Unknown",
+  noLocationProviderAvailable:"To use this application, you have to enable location service. Try closing the app and opening it again",
   languages: {
     ENG: "English",
     TR: "Turkish",
@@ -148,6 +149,7 @@ const en = {
 
 const tr = {
   loading: "Yükleniyor",
+  noLocationProviderAvailable:"Bu uygulamayı kullanmak için konum hizmetini etkinleştirmeniz gerekir. Uygulamayı kapatıp tekrar açmayı deneyin",
   locationServiceDeniedByUserMessage:
     "Bu uygulamayı kullanabilmek için konum izni vermeniz gerekiyor. Uygulamayı kapatıp tekrar açmayı deneyin",
   settingsHeader: "Ayarlar",

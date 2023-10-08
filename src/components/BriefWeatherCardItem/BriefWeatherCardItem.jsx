@@ -26,7 +26,7 @@ function BriefWeatherCardItem({ weather, index }) {
         return hour;
       }
     }
-  }, [weather]);
+  }, [weather,language]);
 
   const { fontScale } = useWindowDimensions();
   const styles = makeStyles(fontScale);
